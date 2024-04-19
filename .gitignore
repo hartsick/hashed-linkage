@@ -3,3 +3,4 @@ scratch
 .Rhistory
 *.old
 README cpl internal.md
+output/

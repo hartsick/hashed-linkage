@@ -31,7 +31,7 @@ from abydos.phonetic import Soundex
 import re
 from pathlib import Path
 import configparser
-from sys import argv
+from sys import argv, exit
 
 import pdb
 
@@ -292,38 +292,42 @@ def hash_data(salt,
     if drop_unhashed_pii:
         clean = clean.drop(columns=vars_to_hash)
     clean.to_csv(output_filepath, sep=",", index=False)  
+
+    print("Output file saved to {}".format(output_filepath))
     
     return clean
 
-# Read in the config file
-# Get config file path from commandline if passed, otherwise use whatever's in the same directory as this script
-config_path = Path(argv[1]) if len(argv) > 1 else Path(__file__).parent.joinpath('hashing_config.ini')
-config_path = str(config_path.resolve())
-# Print it out so there's no ambiguity
-print('Reading config file from {}'.format(config_path))
-config = configparser.ConfigParser(interpolation=None) 
-config.read(config_path)
+if __name__ == '__main__':
+    # Read in the config file
+    # Get config file path from commandline if passed, otherwise use whatever's in the same directory as this script
+    config_path = Path(argv[1]) if len(argv) > 1 else Path(__file__).parent.joinpath('hashing_config.ini')
+    config_path = str(config_path.resolve())
+    # Print it out so there's no ambiguity
+    print('Reading config file from {}'.format(config_path))
+    config = configparser.ConfigParser(interpolation=None) 
+    config.read(config_path)
 
-# Pull out the additional pandas arguments config section so we can clean it a bit and make it a dict
-config_additional_pandas_args = dict(config['Additional pandas arguments'])
-if 'nrows' in config_additional_pandas_args:
-    config_additional_pandas_args['nrows'] = config['Additional pandas arguments'].getint('nrows')
+    # Pull out the additional pandas arguments config section so we can clean it a bit and make it a dict
+    config_additional_pandas_args = dict(config['Additional pandas arguments'])
+    if 'nrows' in config_additional_pandas_args:
+        config_additional_pandas_args['nrows'] = config['Additional pandas arguments'].getint('nrows')
 
-hashed = hash_data(
-    # Perhaps a little ugly to have all of these just be values from a dictionary, but this is so that the config file
-    # can have sections and nice human-readable parameter names
-    salt=config['Salt']['salt'],
-    input_filepath=config['Filepaths']['Input'],
-    output_filepath=config['Filepaths']['Output'],
-    ssn=config['Column names']['SSN'],
-    first_name=config['Column names']['First name'],
-    last_name=config['Column names']['Last name'],
-    dob=config['Column names']['Date of birth'],
-    latest_year=config['Parameters'].getint('Max DOB year'),
-    sep=config['Parameters']['CSV delimiter'],
-    drop_unhashed_pii=config['Parameters'].getboolean('Drop unhashed PII?'),
-    date_errors=config['Parameters']['Date errors'],
-    date_format=config['Parameters']['Date format'],
-    check_linecount=config['Parameters'].getboolean('Check linecount?'),
-    **config_additional_pandas_args
-)
+    hash_data(
+        # Perhaps a little ugly to have all of these just be values from a dictionary, but this is so that the config file
+        # can have sections and nice human-readable parameter names
+        salt=config['Salt']['salt'],
+        input_filepath=config['Filepaths']['Input'],
+        output_filepath=config['Filepaths']['Output'],
+        ssn=config['Column names']['SSN'],
+        first_name=config['Column names']['First name'],
+        last_name=config['Column names']['Last name'],
+        dob=config['Column names']['Date of birth'],
+        latest_year=config['Parameters'].getint('Max DOB year'),
+        sep=config['Parameters']['CSV delimiter'],
+        drop_unhashed_pii=config['Parameters'].getboolean('Drop unhashed PII?'),
+        date_errors=config['Parameters']['Date errors'],
+        date_format=config['Parameters']['Date format'],
+        check_linecount=config['Parameters'].getboolean('Check linecount?'),
+        **config_additional_pandas_args
+    )
+    exit()

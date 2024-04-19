@@ -3,16 +3,16 @@
 This is the repository of code described in the California Policy Lab's [Hashed Linkages for
 Administrative Datasets](https://www.capolicylab.org/connecting-families-to-benefits-using-linked-data-a-toolkit/) guide. There are broadly two steps to a hashed linkage
 (described in detail in the guide), hashing and
-linkage. This respository contains code for both of these steps. The files intended for use by an end user are
+linkage. This respository contains code for both of these steps. The files intended for configuration by an end user are
 as follows:
 
 ##### Hashing
 * `hashing_base_linkagetoolkit.sas` (SAS)
-* `python_hashing_config_template.ini` (Language-agnostic)
+* `hashing_config.ini` (Language-agnostic, used for Python script)
 
 ##### Linkage
-* `hashed_merge_template.Rmd` (R)
-* `hashed_merge_template_minimal.Rmd` (R)
+* `hashed_linkage_template.Rmd` (R)
+* `hashed_linkage_template_minimal.Rmd` (R)
 
 Either the SAS or python code can be used for the hashing process, according to the users's
 preferred language. While the python code itself should not need to be adjusted (all parameters are specified in the .ini file), and
